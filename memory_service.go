@@ -4,7 +4,6 @@ import (
     "flag"
     "log"
     "time"
-
     "github.com/kardianos/service"
     "github.com/cyberporthos/memory_access"
 )
@@ -30,13 +29,17 @@ func (p *program) Start(s service.Service) error {
     return nil
 }
 func (p *program) run() error {
-    logger.Infof("I'm running %v.", service.Platform())
-    ticker := time.NewTicker(10 * time.Second)
+    ticker_duration, ticker_change_duration_chan := memory_access.GetTimerSeconds()
+    logger.Infof("I'm running %v with interval of %d sec.", service.Platform(), ticker_duration)
+    ticker := time.NewTicker(time.Duration(ticker_duration) * time.Second)
     for {
         select {
-        case tm := <-ticker.C:
-            logger.Infof("Still running at %v...", tm)
+        case <-ticker.C:
             memory_access.Run()
+        case tduration := <-ticker_change_duration_chan:
+            logger.Infof("Ticher time has been changed to %d sec", tduration)
+            ticker.Stop()
+            return p.run()
         case <-p.exit:
             ticker.Stop()
             return nil
