@@ -30,14 +30,13 @@ func (p *program) Start(s service.Service) error {
 }
 func (p *program) run() error {
     ticker_duration, ticker_change_duration_chan := memory_access.GetTimerSeconds()
-    logger.Infof("I'm running %v with interval of %d sec.", service.Platform(), ticker_duration)
+    // logger.Infof("I'm running %v with interval of %d sec.", service.Platform(), ticker_duration)
     ticker := time.NewTicker(time.Duration(ticker_duration) * time.Second)
     for {
         select {
         case <-ticker.C:
             memory_access.Run()
-        case tduration := <-ticker_change_duration_chan:
-            logger.Infof("Ticher time has been changed to %d sec", tduration)
+        case <-ticker_change_duration_chan:
             ticker.Stop()
             return p.run()
         case <-p.exit:
