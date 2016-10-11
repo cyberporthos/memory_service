@@ -20,7 +20,7 @@ func (p *program) Start(s service.Service) error {
     if service.Interactive() {
         logger.Info("Running in terminal.")
     } else {
-        logger.Info("Running under service manager.")
+        memory_access.SetNoFeedback()
     }
     p.exit = make(chan struct{})
 
@@ -47,7 +47,9 @@ func (p *program) run() error {
 }
 func (p *program) Stop(s service.Service) error {
     // Any work in Stop should be quick, usually a few seconds at most.
-    logger.Info("I'm Stopping!")
+    if service.Interactive() {
+      logger.Info("I'm Stopping!")
+    }
     close(p.exit)
     return nil
 }
