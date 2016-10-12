@@ -69,6 +69,8 @@ func main() {
         DisplayName: "Memory integration",
         Description: "Software used for Memory integration",
     }
+    svcConfig.Option = make(map[string]interface{})
+    svcConfig.Option["RunAtLoad"] = true
 
     prg := &program{}
     s, err := service.New(prg, svcConfig)
